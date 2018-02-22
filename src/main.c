@@ -36,7 +36,7 @@ init (void)
 	
     factory = ibus_factory_new (ibus_bus_get_connection (bus));
     g_object_ref_sink (factory);
-    ibus_factory_add_engine (factory, "semidead", IBUS_TYPE_ENCHANT_ENGINE);
+    ibus_factory_add_engine (factory, "semidead", IBUS_TYPE_SEMIDEAD_ENGINE);
 
     if (ibus) {
         ibus_bus_request_name (bus, "org.freedesktop.IBus.SemiDead", 0);

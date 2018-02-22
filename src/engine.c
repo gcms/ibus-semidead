@@ -1,65 +1,63 @@
 /* vim:set et sts=4: */
 
-//#include <enchant.h>
 #include "engine.h"
 
-typedef struct _IBusEnchantEngine IBusEnchantEngine;
-typedef struct _IBusEnchantEngineClass IBusEnchantEngineClass;
+typedef struct _IBusSemiDeadEngine IBusSemiDeadEngine;
+typedef struct _IBusSemiDeadEngineClass IBusSemiDeadEngineClass;
 
-struct _IBusEnchantEngine {
+struct _IBusSemiDeadEngine {
     IBusEngine parent;
 
     /* members */
     GString *preedit;
-    GNode *root;
 
-    gint cursor_pos;
+    GNode *root;
     GNode *cur_node;
 };
 
-struct _IBusEnchantEngineClass {
+struct _IBusSemiDeadEngineClass {
     IBusEngineClass parent;
 };
 
 /* functions prototype */
-static void	ibus_enchant_engine_class_init	(IBusEnchantEngineClass	*klass);
-static void	ibus_enchant_engine_init		(IBusEnchantEngine		*engine);
-static void	ibus_enchant_engine_destroy		(IBusEnchantEngine		*engine);
+static void	ibus_semidead_engine_class_init	(IBusSemiDeadEngineClass	*klass);
+static void	ibus_semidead_engine_init		(IBusSemiDeadEngine		*engine);
+static void	ibus_semidead_engine_destroy		(IBusSemiDeadEngine		*engine);
 static gboolean
-ibus_enchant_engine_process_key_event
+ibus_semidead_engine_process_key_event
         (IBusEngine             *engine,
          guint               	 keyval,
          guint               	 keycode,
          guint               	 modifiers);
 
 
-static void ibus_enchant_engine_commit_string
-        (IBusEnchantEngine      *enchant,
+static void ibus_semidead_engine_commit_string
+        (IBusSemiDeadEngine      *enchant,
          const gchar            *string);
 
 static gboolean
-ibus_enchant_engine_process_key_event_node
-        (IBusEnchantEngine *enchant,
+ibus_semidead_engine_process_key_event_node
+        (IBusSemiDeadEngine *enchant,
          guint keyval);
 /*
-static void ibus_enchant_engine_update      (IBusEnchantEngine      *enchant);
+static void ibus_semidead_engine_update      (IBusSemiDeadEngine      *enchant);
 */
 
 
-G_DEFINE_TYPE (IBusEnchantEngine, ibus_enchant_engine, IBUS_TYPE_ENGINE)
+G_DEFINE_TYPE (IBusSemiDeadEngine, ibus_semidead_engine, IBUS_TYPE_ENGINE)
 
 static void
-ibus_enchant_engine_class_init (IBusEnchantEngineClass *klass)
+ibus_semidead_engine_class_init (IBusSemiDeadEngineClass *klass)
 {
     IBusObjectClass *ibus_object_class = IBUS_OBJECT_CLASS (klass);
     IBusEngineClass *engine_class = IBUS_ENGINE_CLASS (klass);
 
-    ibus_object_class->destroy = (IBusObjectDestroyFunc) ibus_enchant_engine_destroy;
+    ibus_object_class->destroy = (IBusObjectDestroyFunc) ibus_semidead_engine_destroy;
 
-    engine_class->process_key_event = ibus_enchant_engine_process_key_event;
+    engine_class->process_key_event = ibus_semidead_engine_process_key_event;
 }
 
-static void ibus_enchant_engine_init_tree(GNode *root,
+static void ibus_semidead_engine_init_tree(GNode *root,
                                           const gchar *keyval,
                                           const gchar *from,
                                           const gchar *to) {
@@ -80,35 +78,34 @@ static void ibus_enchant_engine_init_tree(GNode *root,
 }
 
 static void
-ibus_enchant_engine_init (IBusEnchantEngine *enchant)
+ibus_semidead_engine_init (IBusSemiDeadEngine *enchant)
 {
     enchant->preedit = g_string_new ("");
-    enchant->cursor_pos = 0;
 
     enchant->root = g_node_new (NULL);
 
-    ibus_enchant_engine_init_tree(enchant->root,
+    ibus_semidead_engine_init_tree(enchant->root,
                                   "apostrophe",
                                   "aeioucAEIOUC",
                                   "áéíóúçÁÉÍÓÚÇ");
 
-    ibus_enchant_engine_init_tree(enchant->root,
+    ibus_semidead_engine_init_tree(enchant->root,
                                   "quotedbl",
                                   "aeiouAEIOU",
                                   "äëïöüÄËÏÖÜ");
 
 
-    ibus_enchant_engine_init_tree(enchant->root,
+    ibus_semidead_engine_init_tree(enchant->root,
                                   "asciitilde",
                                   "aonAON",
                                   "ãõñÃÕÑ");
 
-    ibus_enchant_engine_init_tree(enchant->root,
+    ibus_semidead_engine_init_tree(enchant->root,
                                   "asciicircum",
                                   "aeiouAEIOU",
                                   "âêîôûÂÊÎÔÛ");
 
-    ibus_enchant_engine_init_tree(enchant->root,
+    ibus_semidead_engine_init_tree(enchant->root,
                                   "grave",
                                   "aeiouAEIOU",
                                   "àèìòùÀÈÌÒÙ");
@@ -118,18 +115,18 @@ ibus_enchant_engine_init (IBusEnchantEngine *enchant)
 }
 
 static void
-ibus_enchant_engine_destroy (IBusEnchantEngine *enchant)
+ibus_semidead_engine_destroy (IBusSemiDeadEngine *enchant)
 {
     if (enchant->preedit) {
         g_string_free (enchant->preedit, TRUE);
         enchant->preedit = NULL;
     }
 
-    ((IBusObjectClass *) ibus_enchant_engine_parent_class)->destroy ((IBusObject *)enchant);
+    ((IBusObjectClass *) ibus_semidead_engine_parent_class)->destroy ((IBusObject *)enchant);
 }
 
 static void
-ibus_enchant_engine_update_preedit (IBusEnchantEngine *enchant)
+ibus_semidead_engine_update_preedit (IBusSemiDeadEngine *enchant)
 {
     IBusText *text = ibus_text_new_from_static_string (enchant->preedit->str);
 
@@ -143,23 +140,22 @@ ibus_enchant_engine_update_preedit (IBusEnchantEngine *enchant)
 
 /* commit preedit to client and update preedit */
 static gboolean
-ibus_enchant_engine_commit_preedit (IBusEnchantEngine *enchant)
+ibus_semidead_engine_commit_preedit (IBusSemiDeadEngine *enchant)
 {
     if (enchant->preedit->len == 0)
         return FALSE;
 
-    ibus_enchant_engine_commit_string (enchant, enchant->preedit->str);
+    ibus_semidead_engine_commit_string (enchant, enchant->preedit->str);
     g_string_assign (enchant->preedit, "");
-    enchant->cursor_pos = 0;
 
-    ibus_enchant_engine_update_preedit(enchant);
+    ibus_semidead_engine_update_preedit(enchant);
 
     return TRUE;
 }
 
 
 static void
-ibus_enchant_engine_commit_string (IBusEnchantEngine *enchant,
+ibus_semidead_engine_commit_string (IBusSemiDeadEngine *enchant,
                                    const gchar       *string)
 {
     IBusText *text;
@@ -168,7 +164,7 @@ ibus_enchant_engine_commit_string (IBusEnchantEngine *enchant,
 }
 
 static gboolean
-ibus_enchant_engine_process_key_event_node(IBusEnchantEngine *enchant,
+ibus_semidead_engine_process_key_event_node(IBusSemiDeadEngine *enchant,
                                            guint keyval) {
     GNode *node = g_node_find_child(enchant->cur_node, G_TRAVERSE_ALL, keyval);
 
@@ -177,21 +173,19 @@ ibus_enchant_engine_process_key_event_node(IBusEnchantEngine *enchant,
 
     if (g_node_n_children(node) == 1 && G_NODE_IS_LEAF(g_node_first_child(node))) {
 //        g_string_printf(enchant->preedit, "%c", g_node_first_child(node)->data);
-//        ibus_enchant_engine_commit_string(enchant, enchant->preedit->str);
-        ibus_enchant_engine_commit_string(enchant, g_node_first_child(node)->data);
+//        ibus_semidead_engine_commit_string(enchant, enchant->preedit->str);
+        ibus_semidead_engine_commit_string(enchant, g_node_first_child(node)->data);
 
         g_string_assign(enchant->preedit, "");
-        enchant->cursor_pos = 0;
-        ibus_enchant_engine_update_preedit(enchant);
+        ibus_semidead_engine_update_preedit(enchant);
 
         enchant->cur_node = enchant->root;
-        ibus_enchant_engine_commit_preedit(enchant);
+        ibus_semidead_engine_commit_preedit(enchant);
     } else {
         enchant->cur_node = node;
 
         g_string_append_c(enchant->preedit, keyval);
-        enchant->cursor_pos++;
-        ibus_enchant_engine_update_preedit(enchant);
+        ibus_semidead_engine_update_preedit(enchant);
     }
 
     return TRUE;
@@ -201,13 +195,13 @@ ibus_enchant_engine_process_key_event_node(IBusEnchantEngine *enchant,
 #define is_printable(c) (is_alpha((c)) || (c) == IBUS_space)
 
 static gboolean
-ibus_enchant_engine_process_key_event (IBusEngine *engine,
+ibus_semidead_engine_process_key_event (IBusEngine *engine,
                                        guint       keyval,
                                        guint       keycode,
                                        guint       modifiers)
 {
     IBusText *text;
-    IBusEnchantEngine *enchant = (IBusEnchantEngine *)engine;
+    IBusSemiDeadEngine *enchant = (IBusSemiDeadEngine *)engine;
 
 
     if (modifiers & IBUS_RELEASE_MASK)
@@ -222,18 +216,18 @@ ibus_enchant_engine_process_key_event (IBusEngine *engine,
     if (!ibus_keyval_to_unicode(keyval))
 	    return FALSE;
 
-    if (ibus_enchant_engine_process_key_event_node(enchant, keyval))
+    if (ibus_semidead_engine_process_key_event_node(enchant, keyval))
         return TRUE;
 
     gboolean handled = enchant->cur_node != enchant->root && keyval == IBUS_KEY_space;
 
     enchant->cur_node = enchant->root;
-    ibus_enchant_engine_commit_preedit(enchant);
+    ibus_semidead_engine_commit_preedit(enchant);
 
     if (handled)
         return TRUE;
 
-    if (ibus_enchant_engine_process_key_event_node(enchant, keyval))
+    if (ibus_semidead_engine_process_key_event_node(enchant, keyval))
         return TRUE;
 
     return FALSE;

@@ -4,9 +4,9 @@
 
 #include <ibus.h>
 
-#define IBUS_TYPE_ENCHANT_ENGINE	\
-	(ibus_enchant_engine_get_type ())
+#define IBUS_TYPE_SEMIDEAD_ENGINE	\
+	(ibus_semidead_engine_get_type ())
 
-GType   ibus_enchant_engine_get_type    (void);
+GType   ibus_semidead_engine_get_type    (void);
 
 #endif
