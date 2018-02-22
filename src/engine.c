@@ -32,15 +32,15 @@ ibus_semidead_engine_process_key_event
 
 
 static void ibus_semidead_engine_commit_string
-        (IBusSemiDeadEngine      *enchant,
+        (IBusSemiDeadEngine      *sdengine,
          const gchar            *string);
 
 static gboolean
 ibus_semidead_engine_process_key_event_node
-        (IBusSemiDeadEngine *enchant,
+        (IBusSemiDeadEngine *sdengine,
          guint keyval);
 /*
-static void ibus_semidead_engine_update      (IBusSemiDeadEngine      *enchant);
+static void ibus_semidead_engine_update      (IBusSemiDeadEngine      *sdengine);
 */
 
 
@@ -78,114 +78,114 @@ static void ibus_semidead_engine_init_tree(GNode *root,
 }
 
 static void
-ibus_semidead_engine_init (IBusSemiDeadEngine *enchant)
+ibus_semidead_engine_init (IBusSemiDeadEngine *sdengine)
 {
-    enchant->preedit = g_string_new ("");
+    sdengine->preedit = g_string_new ("");
 
-    enchant->root = g_node_new (NULL);
+    sdengine->root = g_node_new (NULL);
 
-    ibus_semidead_engine_init_tree(enchant->root,
+    ibus_semidead_engine_init_tree(sdengine->root,
                                   "apostrophe",
                                   "aeioucAEIOUC",
                                   "áéíóúçÁÉÍÓÚÇ");
 
-    ibus_semidead_engine_init_tree(enchant->root,
+    ibus_semidead_engine_init_tree(sdengine->root,
                                   "quotedbl",
                                   "aeiouAEIOU",
                                   "äëïöüÄËÏÖÜ");
 
 
-    ibus_semidead_engine_init_tree(enchant->root,
+    ibus_semidead_engine_init_tree(sdengine->root,
                                   "asciitilde",
                                   "aonAON",
                                   "ãõñÃÕÑ");
 
-    ibus_semidead_engine_init_tree(enchant->root,
+    ibus_semidead_engine_init_tree(sdengine->root,
                                   "asciicircum",
                                   "aeiouAEIOU",
                                   "âêîôûÂÊÎÔÛ");
 
-    ibus_semidead_engine_init_tree(enchant->root,
+    ibus_semidead_engine_init_tree(sdengine->root,
                                   "grave",
                                   "aeiouAEIOU",
                                   "àèìòùÀÈÌÒÙ");
 
 
-    enchant->cur_node = enchant->root;
+    sdengine->cur_node = sdengine->root;
 }
 
 static void
-ibus_semidead_engine_destroy (IBusSemiDeadEngine *enchant)
+ibus_semidead_engine_destroy (IBusSemiDeadEngine *sdengine)
 {
-    if (enchant->preedit) {
-        g_string_free (enchant->preedit, TRUE);
-        enchant->preedit = NULL;
+    if (sdengine->preedit) {
+        g_string_free (sdengine->preedit, TRUE);
+        sdengine->preedit = NULL;
     }
 
-    ((IBusObjectClass *) ibus_semidead_engine_parent_class)->destroy ((IBusObject *)enchant);
+    ((IBusObjectClass *) ibus_semidead_engine_parent_class)->destroy ((IBusObject *)sdengine);
 }
 
 static void
-ibus_semidead_engine_update_preedit (IBusSemiDeadEngine *enchant)
+ibus_semidead_engine_update_preedit (IBusSemiDeadEngine *sdengine)
 {
-    IBusText *text = ibus_text_new_from_static_string (enchant->preedit->str);
+    IBusText *text = ibus_text_new_from_static_string (sdengine->preedit->str);
 
     text->attrs = ibus_attr_list_new ();
     ibus_attr_list_append (text->attrs,
-                           ibus_attr_underline_new (IBUS_ATTR_UNDERLINE_SINGLE, 0, enchant->preedit->len));
+                           ibus_attr_underline_new (IBUS_ATTR_UNDERLINE_SINGLE, 0, sdengine->preedit->len));
 
-    ibus_engine_update_preedit_text ((IBusEngine *)enchant, text, enchant->preedit->len, TRUE);
+    ibus_engine_update_preedit_text ((IBusEngine *)sdengine, text, sdengine->preedit->len, TRUE);
 
 }
 
 /* commit preedit to client and update preedit */
 static gboolean
-ibus_semidead_engine_commit_preedit (IBusSemiDeadEngine *enchant)
+ibus_semidead_engine_commit_preedit (IBusSemiDeadEngine *sdengine)
 {
-    if (enchant->preedit->len == 0)
+    if (sdengine->preedit->len == 0)
         return FALSE;
 
-    ibus_semidead_engine_commit_string (enchant, enchant->preedit->str);
-    g_string_assign (enchant->preedit, "");
+    ibus_semidead_engine_commit_string (sdengine, sdengine->preedit->str);
+    g_string_assign (sdengine->preedit, "");
 
-    ibus_semidead_engine_update_preedit(enchant);
+    ibus_semidead_engine_update_preedit(sdengine);
 
     return TRUE;
 }
 
 
 static void
-ibus_semidead_engine_commit_string (IBusSemiDeadEngine *enchant,
+ibus_semidead_engine_commit_string (IBusSemiDeadEngine *sdengine,
                                    const gchar       *string)
 {
     IBusText *text;
     text = ibus_text_new_from_static_string (string);
-    ibus_engine_commit_text ((IBusEngine *)enchant, text);
+    ibus_engine_commit_text ((IBusEngine *)sdengine, text);
 }
 
 static gboolean
-ibus_semidead_engine_process_key_event_node(IBusSemiDeadEngine *enchant,
+ibus_semidead_engine_process_key_event_node(IBusSemiDeadEngine *sdengine,
                                            guint keyval) {
-    GNode *node = g_node_find_child(enchant->cur_node, G_TRAVERSE_ALL, keyval);
+    GNode *node = g_node_find_child(sdengine->cur_node, G_TRAVERSE_ALL, keyval);
 
     if (node == NULL)
         return FALSE;
 
     if (g_node_n_children(node) == 1 && G_NODE_IS_LEAF(g_node_first_child(node))) {
-//        g_string_printf(enchant->preedit, "%c", g_node_first_child(node)->data);
-//        ibus_semidead_engine_commit_string(enchant, enchant->preedit->str);
-        ibus_semidead_engine_commit_string(enchant, g_node_first_child(node)->data);
+//        g_string_printf(sdengine->preedit, "%c", g_node_first_child(node)->data);
+//        ibus_semidead_engine_commit_string(sdengine, sdengine->preedit->str);
+        ibus_semidead_engine_commit_string(sdengine, g_node_first_child(node)->data);
 
-        g_string_assign(enchant->preedit, "");
-        ibus_semidead_engine_update_preedit(enchant);
+        g_string_assign(sdengine->preedit, "");
+        ibus_semidead_engine_update_preedit(sdengine);
 
-        enchant->cur_node = enchant->root;
-        ibus_semidead_engine_commit_preedit(enchant);
+        sdengine->cur_node = sdengine->root;
+        ibus_semidead_engine_commit_preedit(sdengine);
     } else {
-        enchant->cur_node = node;
+        sdengine->cur_node = node;
 
-        g_string_append_c(enchant->preedit, keyval);
-        ibus_semidead_engine_update_preedit(enchant);
+        g_string_append_c(sdengine->preedit, keyval);
+        ibus_semidead_engine_update_preedit(sdengine);
     }
 
     return TRUE;
@@ -201,7 +201,7 @@ ibus_semidead_engine_process_key_event (IBusEngine *engine,
                                        guint       modifiers)
 {
     IBusText *text;
-    IBusSemiDeadEngine *enchant = (IBusSemiDeadEngine *)engine;
+    IBusSemiDeadEngine *sdengine = (IBusSemiDeadEngine *)engine;
 
 
     if (modifiers & IBUS_RELEASE_MASK)
@@ -216,18 +216,18 @@ ibus_semidead_engine_process_key_event (IBusEngine *engine,
     if (!ibus_keyval_to_unicode(keyval))
 	    return FALSE;
 
-    if (ibus_semidead_engine_process_key_event_node(enchant, keyval))
+    if (ibus_semidead_engine_process_key_event_node(sdengine, keyval))
         return TRUE;
 
-    gboolean handled = enchant->cur_node != enchant->root && keyval == IBUS_KEY_space;
+    gboolean handled = sdengine->cur_node != sdengine->root && keyval == IBUS_KEY_space;
 
-    enchant->cur_node = enchant->root;
-    ibus_semidead_engine_commit_preedit(enchant);
+    sdengine->cur_node = sdengine->root;
+    ibus_semidead_engine_commit_preedit(sdengine);
 
     if (handled)
         return TRUE;
 
-    if (ibus_semidead_engine_process_key_event_node(enchant, keyval))
+    if (ibus_semidead_engine_process_key_event_node(sdengine, keyval))
         return TRUE;
 
     return FALSE;

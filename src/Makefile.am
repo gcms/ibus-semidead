@@ -35,19 +35,19 @@ ibus_engine_enchant_LDFLAGS = \
 	$(NULL)
 
 component_DATA = \
-	enchant.xml \
+	semidead.xml \
 	$(NULL)
 componentdir = @datadir@/ibus/component
 
 EXTRA_DIST = \
-	enchant.xml.in \
+	semidead.xml.in \
 	$(NULL)
 
 CLEANFILES = \
-	enchant.xml \
+	semidead.xml \
 	$(NULL)
 
-enchant.xml: enchant.xml.in
+semidead.xml: semidead.xml.in
 	$(AM_V_GEN) \
 	( \
 		libexecdir=${libexecdir}; \

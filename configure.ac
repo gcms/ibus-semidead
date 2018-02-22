@@ -69,7 +69,7 @@ AM_GNU_GETTEXT_VERSION(0.16.1)
 AC_CONFIG_FILES(po/Makefile.in
 Makefile
 src/Makefile
-src/enchant.xml.in
+src/semidead.xml.in
 icons/Makefile
 m4/Makefile
 )
