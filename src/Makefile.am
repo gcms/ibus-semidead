@@ -19,18 +19,18 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-libexec_PROGRAMS = ibus-engine-enchant
+libexec_PROGRAMS = ibus-engine-semidead
 
-ibus_engine_enchant_SOURCES = \
+ibus_engine_semidead_SOURCES = \
 	main.c \
 	engine.c \
 	engine.h \
 	$(NULL)
-ibus_engine_enchant_CFLAGS = \
+ibus_engine_semidead_CFLAGS = \
 	@IBUS_CFLAGS@ \
 	-DPKGDATADIR=\"$(pkgdatadir)\"
 	$(NULL)
-ibus_engine_enchant_LDFLAGS = \
+ibus_engine_semidead_LDFLAGS = \
 	@IBUS_LIBS@ \
 	$(NULL)
 
@@ -56,5 +56,5 @@ semidead.xml: semidead.xml.in
 		eval "echo \"$${s}\""; \
 	) > $@
 
-test: ibus-engine-enchant
-	$(builddir)/ibus-engine-enchant
+test: ibus-engine-semidead
+	$(builddir)/ibus-engine-semidead

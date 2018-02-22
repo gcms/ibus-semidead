@@ -3,12 +3,12 @@
 <component>
 	<name>org.freedesktop.IBus.SemiDead</name>
 	<description>SemiDead Component</description>
-	<exec>${libexecdir}/ibus-engine-enchant --ibus</exec>
+	<exec>${libexecdir}/ibus-engine-semidead --ibus</exec>
 	<version>@VERSION@</version>
 	<author>Gustavo Sousa &lt;gustavocms.tmp@gmail.com&gt;</author>
 	<license>GPL</license>
 	<homepage>http://code.google.com/p/ibus</homepage>
-	<textdomain>ibus-enchant</textdomain>
+	<textdomain>ibus-semidead</textdomain>
 
 	<engines>
 		<engine>
@@ -16,7 +16,7 @@
 			<language>en</language>
 			<license>GPL</license>
 			<author>Gustavo Sousa &lt;gustavocms.tmp@gmail.com&gt;</author>
-			<icon>${pkgdatadir}/icons/ibus-enchant.svg</icon>
+			<icon>${pkgdatadir}/icons/ibus-semidead.svg</icon>
 			<layout>us</layout>
 			<longname>SemiDead</longname>
 			<description>US, international semi dead keys</description>

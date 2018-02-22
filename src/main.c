@@ -59,7 +59,7 @@ init (void)
                                                          "en",
                                                          "GPL",
                                                          "Gustavo Sousa <gustavocms.tmp@gmail.com>",
-                                                         PKGDATADIR"/icons/ibus-enchant.svg",
+                                                         PKGDATADIR"/icons/ibus-semidead.svg",
                                                          "us"));
         ibus_bus_register_component (bus, component);
     }
