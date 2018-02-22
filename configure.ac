@@ -56,15 +56,6 @@ PKG_CHECK_MODULES(IBUS, [
     ibus-1.0 >= 1.3.0
 ])
 
-# check enchant
-PKG_CHECK_MODULES(ENCHANT, [
-    enchant
-])
-
-
-#check python
-AM_PATH_PYTHON([2.5])
-
 # define GETTEXT_* variables
 GETTEXT_PACKAGE="$PACKAGE_NAME"
 AC_SUBST(GETTEXT_PACKAGE)
@@ -77,12 +68,8 @@ AM_GNU_GETTEXT_VERSION(0.16.1)
 # OUTPUT files
 AC_CONFIG_FILES(po/Makefile.in
 Makefile
-ibus-tmpl.spec
 src/Makefile
 src/enchant.xml.in
-engine/Makefile
-engine/ibus-engine-enchant
-engine/enchant-python.xml.in
 icons/Makefile
 m4/Makefile
 )

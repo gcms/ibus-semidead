@@ -28,12 +28,10 @@ ibus_engine_enchant_SOURCES = \
 	$(NULL)
 ibus_engine_enchant_CFLAGS = \
 	@IBUS_CFLAGS@ \
-	@ENCHANT_CFLAGS@ \
 	-DPKGDATADIR=\"$(pkgdatadir)\"
 	$(NULL)
 ibus_engine_enchant_LDFLAGS = \
 	@IBUS_LIBS@ \
-	@ENCHANT_LIBS@
 	$(NULL)
 
 component_DATA = \
