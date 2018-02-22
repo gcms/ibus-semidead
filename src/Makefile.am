@@ -47,7 +47,7 @@ CLEANFILES = \
 	enchant.xml \
 	$(NULL)
 
-enchant.xml: enchant.xml.in
+semidead.xml: semidead.xml.in
 	$(AM_V_GEN) \
 	( \
 		libexecdir=${libexecdir}; \
