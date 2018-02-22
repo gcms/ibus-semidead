@@ -36,16 +36,16 @@ init (void)
 	
     factory = ibus_factory_new (ibus_bus_get_connection (bus));
     g_object_ref_sink (factory);
-    ibus_factory_add_engine (factory, "enchant", IBUS_TYPE_ENCHANT_ENGINE);
+    ibus_factory_add_engine (factory, "semidead", IBUS_TYPE_SEMI_DEAD_ENGINE);
 
     if (ibus) {
-        ibus_bus_request_name (bus, "org.freedesktop.IBus.Enchant", 0);
+        ibus_bus_request_name (bus, "org.freedesktop.IBus.SemiDead", 0);
     }
     else {
         IBusComponent *component;
 
-        component = ibus_component_new ("org.freedesktop.IBus.Enchant",
-                                        "Enchant",
+        component = ibus_component_new ("org.freedesktop.IBus.SemiDead",
+                                        "SemiDead",
                                         "0.1.0",
                                         "GPL",
                                         "Gustavo Sousa <gustavocms.tmp@gmail.com>",
@@ -53,10 +53,10 @@ init (void)
                                         "",
                                         "ibus-tmpl");
         ibus_component_add_engine (component,
-                                   ibus_engine_desc_new ("enchant",
-                                                         "Enchant",
-                                                         "Enchant",
-                                                         "pt",
+                                   ibus_engine_desc_new ("semidead",
+                                                         "SemiDead",
+                                                         "SemiDead",
+                                                         "en",
                                                          "GPL",
                                                          "Gustavo Sousa <gustavocms.tmp@gmail.com>",
                                                          PKGDATADIR"/icons/ibus-enchant.svg",

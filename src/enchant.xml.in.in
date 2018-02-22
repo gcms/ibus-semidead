@@ -1,8 +1,8 @@
 <?xml version=\"1.0\" encoding=\"utf-8\"?>
 <!-- filename: enchant.xml -->
 <component>
-	<name>org.freedesktop.IBus.Enchant</name>
-	<description>Enchant Component</description>
+	<name>org.freedesktop.IBus.SemiDead</name>
+	<description>SemiDead Component</description>
 	<exec>${libexecdir}/ibus-engine-enchant --ibus</exec>
 	<version>@VERSION@</version>
 	<author>Gustavo Sousa &lt;gustavocms.tmp@gmail.com&gt;</author>
@@ -12,14 +12,14 @@
 
 	<engines>
 		<engine>
-			<name>enchant</name>
-			<language>pt</language>
+			<name>semidead</name>
+			<language>en</language>
 			<license>GPL</license>
 			<author>Gustavo Sousa &lt;gustavocms.tmp@gmail.com&gt;</author>
 			<icon>${pkgdatadir}/icons/ibus-enchant.svg</icon>
 			<layout>us</layout>
-			<longname>Enchant</longname>
-			<description>Enchant Input Method</description>
+			<longname>US, international semi dead keys</longname>
+			<description>SemiDead Input Method</description>
 			<rank>0</rank>
 		</engine>
 	</engines>
