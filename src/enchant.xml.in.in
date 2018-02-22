@@ -5,7 +5,7 @@
 	<description>Enchant Component</description>
 	<exec>${libexecdir}/ibus-engine-enchant --ibus</exec>
 	<version>@VERSION@</version>
-	<author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
+	<author>Gustavo Sousa &lt;gustavocms.tmp@gmail.com&gt;</author>
 	<license>GPL</license>
 	<homepage>http://code.google.com/p/ibus</homepage>
 	<textdomain>ibus-enchant</textdomain>
@@ -13,9 +13,9 @@
 	<engines>
 		<engine>
 			<name>enchant</name>
-			<language>ko</language>
+			<language>pt</language>
 			<license>GPL</license>
-			<author>Peng Huang &lt;shawn.p.huang@gmail.com&gt;</author>
+			<author>Gustavo Sousa &lt;gustavocms.tmp@gmail.com&gt;</author>
 			<icon>${pkgdatadir}/icons/ibus-enchant.svg</icon>
 			<layout>us</layout>
 			<longname>Enchant</longname>

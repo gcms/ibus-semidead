@@ -48,7 +48,7 @@ init (void)
                                         "Enchant",
                                         "0.1.0",
                                         "GPL",
-                                        "Peng Huang <shawn.p.huang@gmail.com>",
+                                        "Gustavo Sousa <gustavocms.tmp@gmail.com>",
                                         "http://code.google.com/p/ibus/",
                                         "",
                                         "ibus-tmpl");
@@ -56,9 +56,9 @@ init (void)
                                    ibus_engine_desc_new ("enchant",
                                                          "Enchant",
                                                          "Enchant",
-                                                         "ko",
+                                                         "pt",
                                                          "GPL",
-                                                         "Peng Huang <shawn.p.huang@gmail.com>",
+                                                         "Gustavo Sousa <gustavocms.tmp@gmail.com>",
                                                          PKGDATADIR"/icons/ibus-enchant.svg",
                                                          "us"));
         ibus_bus_register_component (bus, component);
