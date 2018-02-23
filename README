@@ -1,9 +1,36 @@
-This is a template engine for IME developers. You could start your IME engine
-from it.
+This is a simple ibus engine that provides a US international keyboard with
+what I have called "semi dead" keys. Apostrophes and quotes work as dead keys
+if followed by a vowel (e.g., ' followed by a becomes á) or other accented
+consonants in latin languages (e.g., ' followed by c becomes ç and ~ followed
+by n becomes ñ). If they are followed by other consonants the symbol is just
+printed (e.g., ' followed by t becomes 't). This is the behavior that is
+usually found in OS X and Windows.
 
-Ibus-tmpl was released under GPLV2. We wish ibus engine developers would release
-new engines under open source license too, but we do not force it. We allow
-developers start your work from ibus-tmpl and swith to other license.
+Probably implementing an ibus engine is not the appropriate way to do this, but
+it was the quickest solution I could find due to the lack of information.
 
-src - engine in c language
-engine - engine in python language
+
+The implementation is based on the https://github.com/phuang/ibus-tmpl project.
+
+To install it you need to install the developer libraries for ibus. It was
+only tested in my system (Ubuntu 16.04 LTS + Gnome).
+
+./autogen.sh
+./configure --prefix=/usr
+make
+sudo make install
+
+
+It is necessary to set ibus as the input method. You can do this by setting the
+environment variables
+
+GTK_IM_MODULE=ibus
+QT_IM_MODULE=ibus
+XMODIFIERS=@im=ibus
+
+
+You may need to restart the ibus-daemon and add the new input method using
+ibus-setup
+
+After restarting the graphical interface, you should find the keyboard
+US, international semi dead in the system input sources list.
