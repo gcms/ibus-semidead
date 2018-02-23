@@ -36,7 +36,7 @@ static void ibus_semidead_engine_commit_string
          const gchar            *string);
 
 static gboolean
-ibus_semidead_engine_process_key_event_node
+ibus_semidead_engine_match_keyval
         (IBusSemiDeadEngine *sdengine,
          guint keyval);
 
@@ -58,20 +58,21 @@ static void ibus_semidead_engine_init_tree(GNode *root,
                                           const gchar *from,
                                           const gchar *to) {
     glong len = strlen(from);
-    g_return_if_fail(len == g_utf8_strlen(to));
+    g_return_if_fail(len == g_utf8_strlen(to, strlen(to)));
 
     guint keyval = ibus_keyval_from_name(keyval_name);
     g_return_if_fail(keyval);
 
     GNode *symbol_node = g_node_append_data(root, keyval);
 
-    gchar *vowel_keyval_name = " ";
+    gchar vowel_keyval_name[2];
     while (*from) {
         *vowel_keyval_name = *from;
 
         GNode *vowel_node = g_node_append_data(symbol_node, ibus_keyval_from_name(vowel_keyval_name));
         g_node_append_data(vowel_node, g_utf8_get_char(to));
 
+        from++;
         to = g_utf8_next_char(to);
     }
 }
@@ -127,18 +128,6 @@ ibus_semidead_engine_destroy (IBusSemiDeadEngine *sdengine)
     ((IBusObjectClass *) ibus_semidead_engine_parent_class)->destroy ((IBusObject *) sdengine);
 }
 
-static void
-ibus_semidead_engine_update_preedit (IBusSemiDeadEngine *sdengine)
-{
-    IBusText *text = ibus_text_new_from_static_string (sdengine->preedit->str);
-
-    text->attrs = ibus_attr_list_new ();
-    ibus_attr_list_append (text->attrs,
-                           ibus_attr_underline_new (IBUS_ATTR_UNDERLINE_SINGLE, 0, sdengine->preedit->len));
-
-    ibus_engine_update_preedit_text ((IBusEngine *)sdengine, text, sdengine->preedit->len, TRUE);
-
-}
 
 static void
 ibus_semidead_engine_update_preedit_text (IBusSemiDeadEngine *sdengine,
@@ -155,10 +144,27 @@ ibus_semidead_engine_update_preedit_text (IBusSemiDeadEngine *sdengine,
 }
 
 static void
+ibus_semidead_engine_update_preedit (IBusSemiDeadEngine *sdengine)
+{
+    ibus_semidead_engine_update_preedit_text (sdengine, sdengine->preedit);
+}
+
+static void
 ibus_semidead_engine_clean_preedit (IBusSemiDeadEngine *sdengine) {
     g_string_assign(sdengine->preedit, "");
     ibus_engine_hide_preedit_text((IBusEngine *) sdengine);
 }
+
+
+
+static void
+ibus_semidead_engine_commit_string (IBusSemiDeadEngine *sdengine,
+                                    const gchar       *string)
+{
+    IBusText *text = ibus_text_new_from_static_string (string);
+    ibus_engine_commit_text ((IBusEngine *) sdengine, text);
+}
+
 
 /* commit preedit to client and update preedit */
 static gboolean
@@ -173,17 +179,8 @@ ibus_semidead_engine_commit_preedit (IBusSemiDeadEngine *sdengine)
     return TRUE;
 }
 
-
-static void
-ibus_semidead_engine_commit_string (IBusSemiDeadEngine *sdengine,
-                                   const gchar       *string)
-{
-    IBusText *text = ibus_text_new_from_static_string (string);
-    ibus_engine_commit_text ((IBusEngine *) sdengine, text);
-}
-
 static gboolean
-ibus_semidead_engine_process_key_event_node(IBusSemiDeadEngine *sdengine,
+ibus_semidead_engine_match_keyval(IBusSemiDeadEngine *sdengine,
                                            guint keyval) {
     GNode *node = g_node_find_child(sdengine->cur_node, G_TRAVERSE_NON_LEAVES, keyval);
 
@@ -222,7 +219,7 @@ ibus_semidead_engine_process_key_event (IBusEngine *engine,
     if (!ibus_keyval_to_unicode(keyval))
 	    return FALSE;
 
-    if (ibus_semidead_engine_process_key_event_node(sdengine, keyval))
+    if (ibus_semidead_engine_match_keyval(sdengine, keyval))
         return TRUE;
 
     gboolean in_sequence = sdengine->cur_node != sdengine->root;
@@ -231,5 +228,5 @@ ibus_semidead_engine_process_key_event (IBusEngine *engine,
     sdengine->cur_node = sdengine->root;
     ibus_semidead_engine_commit_preedit(sdengine);
 
-    return exit_sequence || ibus_semidead_engine_process_key_event_node(sdengine, keyval);
+    return exit_sequence || ibus_semidead_engine_match_keyval(sdengine, keyval);
 }
