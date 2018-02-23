@@ -39,10 +39,6 @@ static gboolean
 ibus_semidead_engine_process_key_event_node
         (IBusSemiDeadEngine *sdengine,
          guint keyval);
-/*
-static void ibus_semidead_engine_update      (IBusSemiDeadEngine      *sdengine);
-*/
-
 
 G_DEFINE_TYPE (IBusSemiDeadEngine, ibus_semidead_engine, IBUS_TYPE_ENGINE)
 
@@ -58,23 +54,26 @@ ibus_semidead_engine_class_init (IBusSemiDeadEngineClass *klass)
 }
 
 static void ibus_semidead_engine_init_tree(GNode *root,
-                                          const gchar *keyval,
+                                          const gchar *keyval_name,
                                           const gchar *from,
                                           const gchar *to) {
+    glong len = strlen(from);
+    g_return_if_fail(len == g_utf8_strlen(to));
 
-    GNode *lead = g_node_append_data(root, ibus_keyval_from_name(keyval));
+    guint keyval = ibus_keyval_from_name(keyval_name);
+    g_return_if_fail(keyval);
 
-    gchar keyval_name[2];
-    keyval_name[1] = NULL;
+    GNode *symbol_node = g_node_append_data(root, keyval);
 
-    for (int i = 0; i < strlen(from); i++) {
-        keyval_name[0] = from[i];
+    gchar *vowel_keyval_name = " ";
+    while (*from) {
+        *vowel_keyval_name = *from;
 
-        GNode *letra = g_node_append_data(lead, ibus_keyval_from_name(keyval_name));
-        g_node_append_data(letra, g_utf8_substring(to, i, i+1));
+        GNode *vowel_node = g_node_append_data(symbol_node, ibus_keyval_from_name(vowel_keyval_name));
+        g_node_append_data(vowel_node, g_utf8_get_char(to));
+
+        to = g_utf8_next_char(to);
     }
-
-
 }
 
 static void
@@ -122,7 +121,10 @@ ibus_semidead_engine_destroy (IBusSemiDeadEngine *sdengine)
         sdengine->preedit = NULL;
     }
 
-    ((IBusObjectClass *) ibus_semidead_engine_parent_class)->destroy ((IBusObject *)sdengine);
+    if (sdengine->root)
+        g_node_destroy(sdengine->root);
+
+    ((IBusObjectClass *) ibus_semidead_engine_parent_class)->destroy ((IBusObject *) sdengine);
 }
 
 static void
@@ -138,6 +140,26 @@ ibus_semidead_engine_update_preedit (IBusSemiDeadEngine *sdengine)
 
 }
 
+static void
+ibus_semidead_engine_update_preedit_text (IBusSemiDeadEngine *sdengine,
+                                          GString *preedit)
+{
+    IBusText *text = ibus_text_new_from_static_string (preedit->str);
+
+    text->attrs = ibus_attr_list_new ();
+    ibus_attr_list_append (text->attrs,
+                           ibus_attr_underline_new (IBUS_ATTR_UNDERLINE_SINGLE, 0, sdengine->preedit->len));
+
+    ibus_engine_update_preedit_text ((IBusEngine *)sdengine, text, preedit->len, TRUE);
+
+}
+
+static void
+ibus_semidead_engine_clean_preedit (IBusSemiDeadEngine *sdengine) {
+    g_string_assign(sdengine->preedit, "");
+    ibus_engine_hide_preedit_text((IBusEngine *) sdengine);
+}
+
 /* commit preedit to client and update preedit */
 static gboolean
 ibus_semidead_engine_commit_preedit (IBusSemiDeadEngine *sdengine)
@@ -146,9 +168,7 @@ ibus_semidead_engine_commit_preedit (IBusSemiDeadEngine *sdengine)
         return FALSE;
 
     ibus_semidead_engine_commit_string (sdengine, sdengine->preedit->str);
-    g_string_assign (sdengine->preedit, "");
-
-    ibus_semidead_engine_update_preedit(sdengine);
+    ibus_semidead_engine_clean_preedit(sdengine);
 
     return TRUE;
 }
@@ -158,41 +178,35 @@ static void
 ibus_semidead_engine_commit_string (IBusSemiDeadEngine *sdengine,
                                    const gchar       *string)
 {
-    IBusText *text;
-    text = ibus_text_new_from_static_string (string);
-    ibus_engine_commit_text ((IBusEngine *)sdengine, text);
+    IBusText *text = ibus_text_new_from_static_string (string);
+    ibus_engine_commit_text ((IBusEngine *) sdengine, text);
 }
 
 static gboolean
 ibus_semidead_engine_process_key_event_node(IBusSemiDeadEngine *sdengine,
                                            guint keyval) {
-    GNode *node = g_node_find_child(sdengine->cur_node, G_TRAVERSE_ALL, keyval);
+    GNode *node = g_node_find_child(sdengine->cur_node, G_TRAVERSE_NON_LEAVES, keyval);
 
     if (node == NULL)
         return FALSE;
 
     if (g_node_n_children(node) == 1 && G_NODE_IS_LEAF(g_node_first_child(node))) {
-//        g_string_printf(sdengine->preedit, "%c", g_node_first_child(node)->data);
-//        ibus_semidead_engine_commit_string(sdengine, sdengine->preedit->str);
-        ibus_semidead_engine_commit_string(sdengine, g_node_first_child(node)->data);
+        g_string_assign(sdengine->preedit, ""); // use preedit as a tmp buffer
+        g_string_append_unichar(sdengine->preedit, g_node_first_child(node)->data);
+        ibus_semidead_engine_commit_string(sdengine, sdengine->preedit->str);
 
-        g_string_assign(sdengine->preedit, "");
-        ibus_semidead_engine_update_preedit(sdengine);
+        ibus_semidead_engine_clean_preedit(sdengine);
 
         sdengine->cur_node = sdengine->root;
-        ibus_semidead_engine_commit_preedit(sdengine);
     } else {
-        sdengine->cur_node = node;
-
         g_string_append_c(sdengine->preedit, keyval);
         ibus_semidead_engine_update_preedit(sdengine);
+
+        sdengine->cur_node = node;
     }
 
     return TRUE;
 }
-
-#define is_alpha(c) (((c) >= IBUS_a && (c) <= IBUS_z) || ((c) >= IBUS_A && (c) <= IBUS_Z))
-#define is_printable(c) (is_alpha((c)) || (c) == IBUS_space)
 
 static gboolean
 ibus_semidead_engine_process_key_event (IBusEngine *engine,
@@ -200,18 +214,10 @@ ibus_semidead_engine_process_key_event (IBusEngine *engine,
                                        guint       keycode,
                                        guint       modifiers)
 {
-    IBusText *text;
     IBusSemiDeadEngine *sdengine = (IBusSemiDeadEngine *)engine;
-
 
     if (modifiers & IBUS_RELEASE_MASK)
         return FALSE;
-
-//    GFile *file = g_file_new_for_path ("/tmp/keyval");
-//    GOutputStream *os = g_file_append_to(file, G_FILE_CREATE_NONE, NULL, NULL);
-//    g_output_stream_printf (os, NULL, NULL, NULL, "%d %d %d %c %s\r\n", keyval, keycode, modifiers, ibus_keyval_to_unicode(keyval), ibus_keyval_name(keyval));
-//    g_object_unref(os);
-//    g_object_unref(file);
 
     if (!ibus_keyval_to_unicode(keyval))
 	    return FALSE;
@@ -219,16 +225,11 @@ ibus_semidead_engine_process_key_event (IBusEngine *engine,
     if (ibus_semidead_engine_process_key_event_node(sdengine, keyval))
         return TRUE;
 
-    gboolean handled = sdengine->cur_node != sdengine->root && keyval == IBUS_KEY_space;
+    gboolean in_sequence = sdengine->cur_node != sdengine->root;
+    gboolean exit_sequence = in_sequence && keyval == IBUS_KEY_space;
 
     sdengine->cur_node = sdengine->root;
     ibus_semidead_engine_commit_preedit(sdengine);
 
-    if (handled)
-        return TRUE;
-
-    if (ibus_semidead_engine_process_key_event_node(sdengine, keyval))
-        return TRUE;
-
-    return FALSE;
+    return exit_sequence || ibus_semidead_engine_process_key_event_node(sdengine, keyval);
 }
