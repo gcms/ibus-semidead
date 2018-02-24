@@ -18,7 +18,7 @@
 			<author>Gustavo Sousa &lt;gustavocms.tmp@gmail.com&gt;</author>
 			<icon>${pkgdatadir}/icons/ibus-semidead.svg</icon>
 			<layout>us-intl</layout>
-			<longname>US, international semi dead keys</longname>
+			<longname>English (US, international semi dead keys)</longname>
 			<description>US, international semi dead keys</description>
 			<rank>0</rank>
 		</engine>
