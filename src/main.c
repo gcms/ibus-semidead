@@ -60,7 +60,7 @@ init (void)
                                                          "GPL",
                                                          "Gustavo Sousa <gustavocms.tmp@gmail.com>",
                                                          PKGDATADIR"/icons/ibus-semidead.svg",
-                                                         "us"));
+                                                         "us-intl"));
         ibus_bus_register_component (bus, component);
     }
 }

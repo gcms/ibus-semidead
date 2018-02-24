@@ -17,7 +17,7 @@
 			<license>GPL</license>
 			<author>Gustavo Sousa &lt;gustavocms.tmp@gmail.com&gt;</author>
 			<icon>${pkgdatadir}/icons/ibus-semidead.svg</icon>
-			<layout>us</layout>
+			<layout>us-intl</layout>
 			<longname>US, international semi dead keys</longname>
 			<description>US, international semi dead keys</description>
 			<rank>0</rank>
