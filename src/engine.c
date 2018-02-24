@@ -14,6 +14,7 @@ struct _IBusSemiDeadEngine {
     GNode *root;
     GNode *cur_node;
 };
+#define ibus_semidead_engine_in_sequence(e) ((e)->cur_node != (e)->root)
 
 struct _IBusSemiDeadEngineClass {
     IBusEngineClass parent;
@@ -176,12 +177,14 @@ ibus_semidead_engine_commit_preedit (IBusSemiDeadEngine *sdengine)
     ibus_semidead_engine_commit_string (sdengine, sdengine->preedit->str);
     ibus_semidead_engine_clean_preedit(sdengine);
 
+    sdengine->cur_node = sdengine->root;
+
     return TRUE;
 }
 
 static gboolean
-ibus_semidead_engine_match_keyval(IBusSemiDeadEngine *sdengine,
-                                           guint keyval) {
+ibus_semidead_engine_match_keyval (IBusSemiDeadEngine *sdengine,
+                                   guint keyval) {
     GNode *node = g_node_find_child(sdengine->cur_node, G_TRAVERSE_NON_LEAVES, keyval);
 
     if (node == NULL)
@@ -205,6 +208,7 @@ ibus_semidead_engine_match_keyval(IBusSemiDeadEngine *sdengine,
     return TRUE;
 }
 
+
 static gboolean
 ibus_semidead_engine_process_key_event (IBusEngine *engine,
                                        guint       keyval,
@@ -213,20 +217,44 @@ ibus_semidead_engine_process_key_event (IBusEngine *engine,
 {
     IBusSemiDeadEngine *sdengine = (IBusSemiDeadEngine *)engine;
 
+    // IGNORE KEY RELEASE
     if (modifiers & IBUS_RELEASE_MASK)
         return FALSE;
 
+    // IGNORED NON-VISIBLE STROKES
     if (!ibus_keyval_to_unicode(keyval))
 	    return FALSE;
 
+    gboolean in_sequence = ibus_semidead_engine_in_sequence(sdengine);
+
+    // INTERRUPT SEQUENCE
+    if (modifiers & (IBUS_CONTROL_MASK | IBUS_MOD1_MASK)) {
+        if (in_sequence)
+            ibus_semidead_engine_commit_preedit(sdengine);
+
+        return FALSE;
+    }
+
+    // FINISH SEQUENCE
+    if (in_sequence && keyval == IBUS_KEY_space) {
+        ibus_semidead_engine_commit_preedit(sdengine);
+        return TRUE;
+    }
+
+    // CANCEL SEQUENCE
+    if (in_sequence && keyval == IBUS_KEY_BackSpace) {
+        ibus_semidead_engine_clean_preedit(sdengine);
+        return TRUE;
+    }
+
+    // MATCH SEQUENCE
     if (ibus_semidead_engine_match_keyval(sdengine, keyval))
         return TRUE;
 
-    gboolean in_sequence = sdengine->cur_node != sdengine->root;
-    gboolean exit_sequence = in_sequence && keyval == IBUS_KEY_space;
+    // INTERRUPT SEQUENCE
+    if (in_sequence)
+        ibus_semidead_engine_commit_preedit(sdengine);
 
-    sdengine->cur_node = sdengine->root;
-    ibus_semidead_engine_commit_preedit(sdengine);
-
-    return exit_sequence || ibus_semidead_engine_match_keyval(sdengine, keyval);
+    // TRY TO START A NEW SEQUENCE
+    return ibus_semidead_engine_match_keyval(sdengine, keyval);
 }
