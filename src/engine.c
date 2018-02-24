@@ -123,8 +123,10 @@ ibus_semidead_engine_destroy (IBusSemiDeadEngine *sdengine)
         sdengine->preedit = NULL;
     }
 
-    if (sdengine->root)
+    if (sdengine->root) {
         g_node_destroy(sdengine->root);
+        sdengine->root = NULL;
+    }
 
     ((IBusObjectClass *) ibus_semidead_engine_parent_class)->destroy ((IBusObject *) sdengine);
 }

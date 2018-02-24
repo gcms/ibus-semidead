@@ -1,6 +1,6 @@
 # vim:set et ts=4:
 #
-# ibus-tmpl - The Input Bus template project
+# ibus-semidead - Template engine for typing latin languages in US keyboard
 #
 # Copyright (c) 2007-2011 Gustavo Sousa <gustavocms.tmp@gmail.com>
 #
@@ -19,7 +19,7 @@
 # Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 
 # if not 1, append datestamp to the version number.
-m4_define([package_name], [ibus-tmpl])
+m4_define([package_name], [ibus-semidead])
 m4_define([ibus_released], [0])
 m4_define([ibus_major_version], [1])
 m4_define([ibus_minor_version], [2])

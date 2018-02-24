@@ -1,6 +1,6 @@
 # vim:set noet ts=4:
 #
-# ibus-tmpl - The Input Bus template project
+# ibus-semidead - Template engine for typing latin languages in US keyboard
 #
 # Copyright (c) 2007-2011 Gustavo Sousa <gustavocms.tmp@gmail.com>
 #
