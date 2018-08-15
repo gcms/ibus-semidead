@@ -16,11 +16,13 @@
 			<language>en</language>
 			<license>GPL</license>
 			<author>Gustavo Sousa &lt;gustavocms.tmp@gmail.com&gt;</author>
-			<icon>${pkgdatadir}/icons/ibus-semidead.svg</icon>
-			<layout>us-intl</layout>
-			<longname>English (US, international semi dead keys)</longname>
-			<description>US, international semi dead keys</description>
-			<rank>0</rank>
+<!--			<icon>${pkgdatadir}/icons/ibus-semidead.svg</icon> -->
+			<icon>ibus-keyboard</icon>
+			<layout>us</layout>
+			<layout_variant>intl</layout_variant>
+			<longname>US, international semi dead keys</longname>
+			<description>English (US, international semi dead keys)</description>
+<!--			<rank>0</rank> -->
 		</engine>
 	</engines>
 

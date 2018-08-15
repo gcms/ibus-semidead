@@ -49,18 +49,20 @@ init (void)
                                         "0.1.0",
                                         "GPL",
                                         "Gustavo Sousa <gustavocms.tmp@gmail.com>",
-                                        "http://code.google.com/p/ibus/",
+                                        "http://github.com/gcms/ibus-semidead/",
                                         "",
                                         "ibus-semidead");
         ibus_component_add_engine (component,
-                                   ibus_engine_desc_new ("semidead",
-                                                         "SemiDead",
-                                                         "SemiDead",
-                                                         "en",
-                                                         "GPL",
-                                                         "Gustavo Sousa <gustavocms.tmp@gmail.com>",
-                                                         PKGDATADIR"/icons/ibus-semidead.svg",
-                                                         "us-intl"));
+                                  ibus_engine_desc_new_varargs (
+                                         "name", "semidead",
+                                         "longname", "SemiDead",
+                                         "description", "SemiDead",
+                                         "language", "en",
+                                         "license", "GPL",
+                                         "author", "Gustavo Sousa <gustavocms.tmp@gmail.com>",
+                                         "layout", "us",
+                                         "layout-variant", "intl",
+                                         NULL));
         ibus_bus_register_component (bus, component);
     }
 }
